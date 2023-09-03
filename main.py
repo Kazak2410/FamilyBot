@@ -45,7 +45,7 @@ async def on_startup(_):
 
 @db.message_handler(commands=['start'])
 async def cmd_start(message: types.Message):
-    await message.answer('Поздравляем ты присоединился!')
+    await message.answer("Поздравляем! Ты присоединился к системе управления домашними обязанностями.")
     print(get_users())
     database.insert_user(message)
 
@@ -56,8 +56,4 @@ async def cmd_list(message: types.Message):
 
 
 if __name__ == "__main__":
-    # loop = asyncio.get_event_loop()
-    # loop.create_task(scheduled(5))
     executor.start_polling(db, on_startup=on_startup, skip_updates=True)
-
-""" Остановился на функции, которая должна поочередно выдавать имена пользователей, с интревалом раз в день"""

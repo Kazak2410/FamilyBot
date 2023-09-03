@@ -17,7 +17,7 @@ class DataBase:
     def insert_user(self, user):
         self.cursor.execute("""
             INSERT OR IGNORE INTO users (id, name) VALUES (?, ?)
-        """, (user.from_user.id, user.from_user.username))
+        """, (user.from_user.id, user.from_user.first_name))
         self.connection.commit()
 
     def get_users(self):
