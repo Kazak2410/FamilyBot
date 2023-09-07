@@ -9,15 +9,16 @@ class DataBase:
     def create_table(self):
         self.cursor.execute("""
             CREATE TABLE users (
-                id INTEGER PRIMARY KEY,
-                name TEXT NOT NULL
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                photo TEXT
             )
         """)
 
-    def insert_user(self, user):
+    def registrate_user(self, name, photo):
         self.cursor.execute("""
-            INSERT OR IGNORE INTO users (id, name) VALUES (?, ?)
-        """, (user.from_user.id, user.from_user.first_name))
+            INSERT OR IGNORE INTO users (name, photo) VALUES (?, ?)
+        """, (name, photo))
         self.connection.commit()
 
     def get_users(self):
