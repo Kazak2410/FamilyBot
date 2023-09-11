@@ -6,6 +6,7 @@ class DataBase:
         self.connection = sqlite3.connect(f"{filename}.db")
         self.cursor = self.connection.cursor()
 
+
     def create_table(self):
         self.cursor.execute("""
             CREATE TABLE users (
@@ -15,17 +16,27 @@ class DataBase:
             )
         """)
 
-    def registrate_user(self, name, photo):
+
+    def registrate_user(self, user_id, name, photo):
         self.cursor.execute("""
-            INSERT OR IGNORE INTO users (name, photo) VALUES (?, ?)
-        """, (name, photo))
+            INSERT OR IGNORE INTO users (id, name, photo) VALUES (?, ?, ?)
+        """, (user_id, name, photo))
         self.connection.commit()
+
 
     def get_users(self):
         self.cursor.execute("""
             SELECT name FROM users
         """)
         return " ".join(name[0] for name in self.cursor.fetchall())
+
+
+    def get_user_id(self, name):
+        self.cursor.execute(f"""
+            SELECT id FROM users WHERE name='{name}'
+        """)
+        return self.cursor.fetchall()[0][0]
+
 
     def check_table(self):
         self.cursor.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='users')")
