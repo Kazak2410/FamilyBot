@@ -38,6 +38,13 @@ class DataBase:
         return self.cursor.fetchall()[0][0]
 
 
+    def get_user_photo(self, user_id):
+        self.cursor.execute(f"""
+            SELECT photo FROM users WHERE id='{user_id}'
+        """)
+        return f"{self.cursor.fetchall()[0][0]}.jpg"
+
+
     def check_table(self):
         self.cursor.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='users')")
         exists = self.cursor.fetchone()[0]

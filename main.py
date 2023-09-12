@@ -1,14 +1,13 @@
 import os
 from datetime import datetime
 from db import DataBase
-from keyboard import register_kb, yes_no_kb
+from keyboard import register_kb
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, executor, types
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
 
 
 load_dotenv()
@@ -31,6 +30,7 @@ def get_users():
     users = database.get_users().split()
     return users
 
+
 async def send_message_cron(bot: Bot):
     global current_user_index
     if current_user_index < len(get_users()):
@@ -40,12 +40,17 @@ async def send_message_cron(bot: Bot):
         user = get_users()[current_user_index]
     current_user_index += 1
     message = f"Сегодня дежурит на кухне {user}"
-    await bot.send_message(-945893857, message, reply_markup=yes_no_kb())
+
+    user_id = database.get_user_id(user)
+    photo_path = f"media\\images\\{database.get_user_photo(user_id)}"
+
+    with open(photo_path, "rb") as photo_file:
+        await bot.send_photo(-945893857, photo=types.InputFile(photo_file), caption=message)
 
 
 def setup_scheduler(bot):
     scheduler = AsyncIOScheduler(timezone="Europe/Kyiv")
-    scheduler.add_job(send_message_cron, trigger="cron", hour=6, minute=53,
+    scheduler.add_job(send_message_cron, trigger="cron", hour=12, minute=32,
                     start_date=datetime.now(), kwargs={"bot": bot})
     scheduler.start()
     return scheduler
@@ -123,14 +128,6 @@ async def load_photo(message: types.Message, state: FSMContext):
 async def users_list(message: types.Message):
     users = "Список участников:\n" + " \n".join(user for user in get_users())
     await message.answer(users)
-
-
-@db.callback_query_handler()
-async def personal_account(callback_query: types.CallbackQuery):
-    if callback_query.data == "yes":
-        pass
-    elif callback_query.data == "no":
-        await send_message_cron(bot)
 
 
 if __name__ == "__main__":
